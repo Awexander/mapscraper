@@ -1,24 +1,13 @@
 
-import aiohttp
 import asyncio
-from urllib.parse import urlparse
+from src.googlemap import shorturl
+from src.nominatimapi import nominatimapi
 
-url = 'https://goo.gl/maps/Bxe2SrQEDZHZVo6s7'
+nomimapi = nominatimapi()
+url = 'https://goo.gl/maps/riWVtrtYbq8WG71e8'
+
 async def main():
-    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(30)) as session:
-        async with session.head(url, allow_redirects=False) as resp:
-            longURL = resp.headers.get('Location')
-    
-            path = urlparse(longURL).path.split('/')
-            coord = ''
-            for p in path: 
-                l = p.strip()
-                if bool(l) is False: pass
-                elif l[0] == '@': 
-                    coord = p[1:]
-                    break
-            
-            print(coord)
-            
+    coord = await shorturl(url)
+    print(await nomimapi.response(coord))
 
 asyncio.get_event_loop().run_until_complete(main())
